@@ -22,6 +22,6 @@ L'algorithme fonctionne comme suit :
 ## Utilisation
 [Incluez ici les instructions pour utiliser votre code, par exemple :]
 
-2. Clonez ce dépôt GitHub.
-2. Exécutez python main.py dans un terminal.
-2. Suivez les instructions à l'écran pour entrer vos tentatives et recevoir le feedback. Pour activer le solveur, rentrez '*' lors du premier tour.
+1. Clonez ce dépôt GitHub.
+1. Exécutez python main.py dans un terminal.
+1. Suivez les instructions à l'écran pour entrer vos tentatives et recevoir le feedback. Pour activer le solveur, rentrez '*' lors du premier tour.
