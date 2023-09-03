@@ -33,14 +33,14 @@ def main():
                     user_choice = list(input())
                 try_res = check_colors(user_choice, secret_colors)
         else:
-            still_possible_combinations = remove_useless_combinations(still_possible_combinations, user_choice, try_res[0], try_res[1])
+            still_possible_combinations = remove_impossible_combinations(still_possible_combinations, user_choice, try_res[0], try_res[1])
             user_choice = define_next_combination_try(still_possible_combinations)
             print(f'Le solveur à choisi {user_choice}')
             try_res = check_colors(user_choice, secret_colors)
 
-        print(try_res[0], ' bien placé(s)')
-        print(try_res[1], ' mal placé(s)')
         nb_bien_place = try_res[0]
+        print(nb_bien_place, ' bien placé(s)')
+        print(try_res[1], ' mal placé(s)')
         nb_turns += 1
         
     if(nb_turns > nb_turns_limit):
@@ -50,14 +50,40 @@ def main():
         print('\nPartie gagnée, bravo !')
         print(f'Nombre de tours : {nb_turns-1}')
 
-def remove_useless_combinations(still_possible_combinations, user_choice, nb_bien_places, nb_good_colors):
+    print(f'Le solveur à choisi {user_choice}')
+    return (check_colors(user_choice, secret_colors), still_possible_combinations, user_choice)
+
+def remove_impossible_combinations(still_possible_combinations, user_choice, nb_bien_places, nb_good_colors):
+    """
+    Supprime les combinaisons impossibles de la liste des combinaisons encore possibles en fonction du choix de l'utilisateur et du résultat de ce choix.
+
+    Args:
+    still_possible_combinations (list): Liste des combinaisons encore possibles.
+    user_choice (list): Liste des couleurs choisies par l'utilisateur.
+    nb_bien_places (int): Nombre de couleurs bien placées dans le choix de l'utilisateur.
+    nb_good_colors (int): Nombre de bonnes couleurs mal placées dans le choix de l'utilisateur.
+
+    Returns:
+    list: Liste mise à jour des combinaisons encore possibles après suppression des combinaisons impossibles.
+    """
     combination_to_keep = (nb_bien_places, nb_good_colors)
     still_possible_combinations[:] = [combination for combination in still_possible_combinations
                            if check_colors(user_choice, combination) == combination_to_keep]
-    print(f"Nombre de combinaisons restantes : {len(still_possible_combinations)}")
     return still_possible_combinations
 
-def check_colors(user_choice, secret_colors):
+def check_colors(user_choice: list, secret_colors: list) -> tuple:
+    """
+    Compare la sélection de couleurs de l'utilisateur avec les couleurs secrètes pour déterminer le nombre de couleurs bien placées et le nombre de bonnes couleurs mal placées.
+
+    Args:
+    user_choice (list): Liste des couleurs choisies par l'utilisateur.
+    secret_colors (list): Liste des couleurs secrètes.
+
+    Returns:
+    tuple: Un tuple contenant deux éléments :
+      - nb_bien_place (int): Le nombre de couleurs de la sélection de l'utilisateur qui sont identiques et à la même position que dans les couleurs secrètes.
+      - nb_good_color (int): Le nombre de couleurs de la sélection de l'utilisateur qui sont présentes dans les couleurs secrètes mais qui ne sont pas à la bonne position.
+    """
     nb_bien_place = 0
     nb_good_color = 0
     tmp_list = list(secret_colors)
@@ -69,29 +95,41 @@ def check_colors(user_choice, secret_colors):
             nb_good_color += 1
     return nb_bien_place, nb_good_color
 
-def define_next_combination_try(still_possible_combinations):
+def define_next_combination_try(still_possible_combinations: list) -> list:
+    """
+    Détermine la meilleure combinaison à essayer ensuite en minimisant le pire des cas du nombre de combinaisons restantes possibles.
+
+    Args:
+    still_possible_combinations (list): Liste des combinaisons possibles restantes.
+
+    Returns:
+    list: La meilleure combinaison à essayer ensuite.
+    """
     score_min = float('inf')
     best_combination = None
     
-    # Vérifie chaque combinaison possible
+    # On créé un dictionnaire pour stocker le nombre de combinaisons qui donneraient chaque réponse possible
+    possible_responses = {response: 0 for response in itertools.product(range(5), repeat=2)}
+    possible_responses_tmp = possible_responses
+    
+    # Pour chaque combinaison possible, on calcule le nombre de combinaisons qui donneraient chaque réponse possible
     for combination in still_possible_combinations:
-        # Pour chaque combinaison possible, calcule le nombre maximum de combinaisons restantes pour chaque réponse possible
-        max_restantes = 0
-        for reponse in itertools.product(range(5), repeat=2):
-            restantes = sum(1 for combo in still_possible_combinations if reponse == obtenir_reponse(combination, combo))
-            max_restantes = max(max_restantes, restantes)
-        
-        # Si cette combination minimise le nombre maximum de combinaisons restantes, met à jour la meilleure combination et le score minimum
+        for combination2 in still_possible_combinations:
+            response = check_colors(combination, combination2)
+            possible_responses_tmp[response] += 1
+    
+        # Trouver le maximum des combinaisons restantes pour chaque réponse possible
+        max_restantes = max(possible_responses_tmp.values())
+
+        # Si cette combinaison minimise le nombre maximum de combinaisons restantes, alors on considère que c'est pour l'instant la meilleure combinaison à tester
         if max_restantes < score_min:
             best_combination = combination
             score_min = max_restantes
+        
+        # Réinitialisation des réponses pour la prochaine itération
+        possible_responses_tmp = possible_responses
             
     return best_combination
-
-def obtenir_reponse(combination, combo):
-    rouges = sum(g == c for g, c in zip(combination, combo))
-    blancs = sum(g in combo for g in combination) - rouges
-    return rouges, blancs
 
 def check_string_composition(input_string: str, string_list: list, nb_combinations: int) -> bool:
     '''
@@ -105,12 +143,9 @@ def check_string_composition(input_string: str, string_list: list, nb_combinatio
     Returns:
         bool: True si la chaîne est composée uniquement de caractères de la liste, False sinon.
     '''
-    if len(input_string) > nb_combinations:
-        return False
-    for char in input_string:
-        if char not in string_list:
-            return False
-    return True
+    # On vérifie la bonne taille de input_string et si chaque caractère de input_string est bien dans string_list.
+    return len(input_string) <= nb_combinations and all(char in string_list for char in input_string)
+
 
 if __name__ == '__main__':
     main()
