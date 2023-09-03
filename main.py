@@ -79,7 +79,7 @@ def get_user_choice(nb_turns: int, colors: list, nb_combinations: int) -> tuple:
         user_choice = list(input())
     return user_choice, False
 
-def solver_processing(still_possible_combinations, user_choice, try_res, colors, nb_combinations):
+def solver_processing(still_possible_combinations: list, user_choice: list, try_res: tuple, colors: list, nb_combinations: int):
     """
     Gère le traitement du solveur pour trouver la prochaine combinaison à essayer.
 
@@ -112,7 +112,7 @@ def solver_processing(still_possible_combinations, user_choice, try_res, colors,
     print(f'Le solveur à choisi {user_choice}')
     return still_possible_combinations, user_choice
 
-def remove_impossible_combinations(still_possible_combinations, user_choice, nb_bien_places, nb_good_colors):
+def remove_impossible_combinations(still_possible_combinations: list, user_choice:list, nb_bien_places:int, nb_good_colors:int):
     """
     Supprime les combinaisons impossibles de la liste des combinaisons encore possibles en fonction du choix de l'utilisateur et du résultat de ce choix.
 
