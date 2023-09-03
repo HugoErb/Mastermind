@@ -11,44 +11,106 @@ def main():
     nb_bien_place = 0
     nb_turns = 1
     solver_activated = False
+    still_possible_combinations = []
+    try_res = None
 
     while nb_bien_place != nb_combinations and nb_turns <= nb_turns_limit:
         print(f'\nTour n° {nb_turns}')
         if not solver_activated:
-            print('Quel est votre choix (r b v j m o) :')
-            user_choice = list(input())
-            if nb_turns == 1 and user_choice == ['*']:
-                print('Activation du solveur')
-                solver_activated = True
-                # On créé une liste contenant toutes les combinaisons possibles
-                still_possible_combinations = list(itertools.product(colors, repeat=nb_combinations))
-                user_choice = ['r','r','b','b']
-                print(f'Le solveur à choisi {user_choice}')
-                try_res = check_colors(user_choice, secret_colors)
-            else:
-                if (user_choice == ['*']):
-                    print('L\'activation du solveur n\'est possible que durant le premier tour.')
-                while not check_string_composition(user_choice, colors, nb_combinations):
-                    print('Veuillez rentrer une suite de couleurs autorisées (r b v j m o) :')
-                    user_choice = list(input())
-                try_res = check_colors(user_choice, secret_colors)
+            user_choice, solver_activated = get_user_choice(nb_turns, colors, nb_combinations)
+            if solver_activated:
+                still_possible_combinations, user_choice = solver_processing(None, None, None, colors, nb_combinations)
         else:
-            still_possible_combinations = remove_impossible_combinations(still_possible_combinations, user_choice, try_res[0], try_res[1])
-            user_choice = define_next_combination_try(still_possible_combinations)
-            print(f'Le solveur à choisi {user_choice}')
-            try_res = check_colors(user_choice, secret_colors)
+            still_possible_combinations, user_choice = solver_processing(still_possible_combinations, user_choice, try_res, colors, nb_combinations)
 
+        try_res = check_colors(user_choice, secret_colors)
         nb_bien_place = try_res[0]
         print(nb_bien_place, ' bien placé(s)')
         print(try_res[1], ' mal placé(s)')
         nb_turns += 1
+
+    print_end_game_infos(nb_turns, nb_turns_limit, secret_colors)
         
+def print_end_game_infos(nb_turns: int, nb_turns_limit: int, secret_colors: list):
+    """
+    Affiche les informations de fin de partie, indiquant si l'utilisateur a gagné ou perdu, et, le cas échéant, affiche les couleurs secrètes.
+
+    Args:
+    nb_turns (int): Le nombre de tours joués.
+    nb_turns_limit (int): Le nombre maximum de tours autorisés.
+    secret_colors (list): Liste des couleurs secrètes.
+
+    Notes:
+    Si le nombre de tours joués est supérieur à la limite de tours, affiche un message indiquant que la partie est perdue et affiche les couleurs recherchées.
+    Sinon, la fonction affiche un message de félicitations pour avoir gagné la partie et affiche le nombre de tours joués.
+    """
     if(nb_turns > nb_turns_limit):
         print('\nPartie perdu...')
         print(f'La réponse était {secret_colors}')
     else:
         print('\nPartie gagnée, bravo !')
         print(f'Nombre de tours : {nb_turns-1}')
+        exit()
+
+def get_user_choice(nb_turns: int, colors: list, nb_combinations: int) -> tuple:
+    """
+    Demande à l'utilisateur de choisir une combinaison de couleurs ou d'activer le solveur.
+
+    Args:
+    nb_turns (int): Le numéro du tour en cours.
+    colors (list): Liste des couleurs autorisées (par exemple, ['r', 'b', 'v', 'j', 'm', 'o']).
+    nb_combinations (int): Nombre de couleurs par combinaison.
+
+    Returns:
+    tuple: Un tuple contenant deux éléments :
+      - user_choice (list): La liste des couleurs choisies par l'utilisateur.
+      - bool: True si l'utilisateur a choisi d'activer le solveur, False sinon.
+    """
+    print('Quel est votre choix (r b v j m o) :')
+    user_choice = list(input())
+    if user_choice == ['*']:
+        if nb_turns == 1:
+            print('Activation du solveur')
+            return None, True  # Activation du solveur
+        else:
+            print('L\'activation du solveur n\'est possible que durant le premier tour.')
+    while not check_string_composition(user_choice, colors, nb_combinations):
+        print('Veuillez rentrer une suite de couleurs autorisées (r b v j m o) :')
+        user_choice = list(input())
+    return user_choice, False
+
+def solver_processing(still_possible_combinations, user_choice, try_res, colors, nb_combinations):
+    """
+    Gère le traitement du solveur pour trouver la prochaine combinaison à essayer.
+
+    Si 'try_res' est None, cela signifie que c'est la première fois que le solveur est activé, 
+    et il initialise 'still_possible_combinations' à toutes les combinaisons possibles 
+    et définit 'user_choice' à une combinaison arbitraire.
+
+    Si 'try_res' n'est pas None, cela signifie que le solveur a déjà été activé, et il 
+    élimine les combinaisons impossibles de 'still_possible_combinations' et définit 
+    'user_choice' à la prochaine combinaison à essayer.
+
+    Args:
+    still_possible_combinations (list): Liste des combinaisons possibles restantes.
+    user_choice (list): Dernière combinaison de couleurs choisie par l'utilisateur ou par le solveur.
+    try_res (tuple): Résultat du dernier essai (nb_bien_place, nb_mal_place) ou None si c'est le premier essai.
+    colors (list): Liste des couleurs autorisées.
+    nb_combinations (int): Nombre de couleurs par combinaison.
+
+    Returns:
+    tuple: Un tuple contenant deux éléments :
+      - still_possible_combinations (list): Liste mise à jour des combinaisons possibles restantes.
+      - user_choice (list): La prochaine combinaison de couleurs que le solveur souhaite essayer.
+    """
+    if try_res is None:
+        still_possible_combinations = list(itertools.product(colors, repeat=nb_combinations))
+        user_choice = ['r','r','b','b']
+    else:
+        still_possible_combinations = remove_impossible_combinations(still_possible_combinations, user_choice, try_res[0], try_res[1])
+        user_choice = define_next_combination_try(still_possible_combinations)
+    print(f'Le solveur à choisi {user_choice}')
+    return still_possible_combinations, user_choice
 
 def remove_impossible_combinations(still_possible_combinations, user_choice, nb_bien_places, nb_good_colors):
     """
