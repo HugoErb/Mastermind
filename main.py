@@ -50,9 +50,6 @@ def main():
         print('\nPartie gagnée, bravo !')
         print(f'Nombre de tours : {nb_turns-1}')
 
-    print(f'Le solveur à choisi {user_choice}')
-    return (check_colors(user_choice, secret_colors), still_possible_combinations, user_choice)
-
 def remove_impossible_combinations(still_possible_combinations, user_choice, nb_bien_places, nb_good_colors):
     """
     Supprime les combinaisons impossibles de la liste des combinaisons encore possibles en fonction du choix de l'utilisateur et du résultat de ce choix.
