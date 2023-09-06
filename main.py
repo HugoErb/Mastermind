@@ -79,7 +79,7 @@ def get_user_choice(nb_turns: int, colors: list, nb_combinations: int) -> tuple:
         user_choice = list(input())
     return user_choice, False
 
-def solver_processing(still_possible_combinations: list, user_choice: list, try_res: tuple, colors: list, nb_combinations: int):
+def solver_processing(still_possible_combinations: list, user_choice: list, try_res: tuple, colors: list, nb_combinations: int) -> tuple:
     """
     Gère le traitement du solveur pour trouver la prochaine combinaison à essayer.
 
@@ -112,7 +112,7 @@ def solver_processing(still_possible_combinations: list, user_choice: list, try_
     print(f'Le solveur à choisi {user_choice}')
     return still_possible_combinations, user_choice
 
-def remove_impossible_combinations(still_possible_combinations: list, user_choice:list, nb_bien_places:int, nb_good_colors:int):
+def remove_impossible_combinations(still_possible_combinations: list, user_choice:list, nb_bien_places:int, nb_good_colors:int) -> list:
     """
     Supprime les combinaisons impossibles de la liste des combinaisons encore possibles en fonction du choix de l'utilisateur et du résultat de ce choix.
 
@@ -169,7 +169,7 @@ def define_next_combination_try(still_possible_combinations: list) -> list:
     
     # On créé un dictionnaire pour stocker le nombre de combinaisons qui donneraient chaque réponse possible
     possible_responses = {response: 0 for response in itertools.product(range(5), repeat=2)}
-    possible_responses_tmp = possible_responses
+    possible_responses_tmp = possible_responses.copy()
     
     # Pour chaque combinaison possible, on calcule le nombre de combinaisons qui donneraient chaque réponse possible
     for combination in still_possible_combinations:
@@ -186,7 +186,7 @@ def define_next_combination_try(still_possible_combinations: list) -> list:
             score_min = max_restantes
         
         # Réinitialisation des réponses pour la prochaine itération
-        possible_responses_tmp = possible_responses
+        possible_responses_tmp = possible_responses.copy()
             
     return best_combination
 
