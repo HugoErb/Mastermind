@@ -1,12 +1,12 @@
 import random
 import itertools
 
-colors = ['r', 'b', 'v', 'j', 'm', 'o']
-nb_combinations = 4
-nb_turns_limit = 8
+COLORS = ['r', 'b', 'v', 'j', 'm', 'o']
+NB_COMBINATIONS = 4
+NB_TURNS_LIMIT = 8
 
 def main():
-    secret_colors = random.sample(colors, nb_combinations)
+    secret_colors = random.sample(COLORS, NB_COMBINATIONS)
     print(' '.join(secret_colors))
     nb_bien_place = 0
     nb_turns = 1
@@ -14,14 +14,14 @@ def main():
     still_possible_combinations = []
     try_res = None
 
-    while nb_bien_place != nb_combinations and nb_turns <= nb_turns_limit:
+    while nb_bien_place != NB_COMBINATIONS and nb_turns <= NB_TURNS_LIMIT:
         print(f'\nTour n° {nb_turns}')
         if not solver_activated:
-            user_choice, solver_activated = get_user_choice(nb_turns, colors, nb_combinations)
+            user_choice, solver_activated = get_user_choice(nb_turns, COLORS, NB_COMBINATIONS)
             if solver_activated:
-                still_possible_combinations, user_choice = solver_processing(None, None, None, colors, nb_combinations)
+                still_possible_combinations, user_choice = solver_processing(None, None, None, COLORS, NB_COMBINATIONS)
         else:
-            still_possible_combinations, user_choice = solver_processing(still_possible_combinations, user_choice, try_res, colors, nb_combinations)
+            still_possible_combinations, user_choice = solver_processing(still_possible_combinations, user_choice, try_res, COLORS, NB_COMBINATIONS)
 
         try_res = check_colors(user_choice, secret_colors)
         nb_bien_place = try_res[0]
@@ -29,22 +29,22 @@ def main():
         print(try_res[1], ' mal placé(s)')
         nb_turns += 1
 
-    print_end_game_infos(nb_turns, nb_turns_limit, secret_colors)
+    print_end_game_infos(nb_turns, NB_TURNS_LIMIT, secret_colors)
         
-def print_end_game_infos(nb_turns: int, nb_turns_limit: int, secret_colors: list):
+def print_end_game_infos(nb_turns: int, NB_TURNS_LIMIT: int, secret_colors: list):
     """
     Affiche les informations de fin de partie, indiquant si l'utilisateur a gagné ou perdu, et, le cas échéant, affiche les couleurs secrètes.
 
     Args:
     nb_turns (int): Le nombre de tours joués.
-    nb_turns_limit (int): Le nombre maximum de tours autorisés.
+    NB_TURNS_LIMIT (int): Le nombre maximum de tours autorisés.
     secret_colors (list): Liste des couleurs secrètes.
 
     Notes:
     Si le nombre de tours joués est supérieur à la limite de tours, affiche un message indiquant que la partie est perdue et affiche les couleurs recherchées.
     Sinon, la fonction affiche un message de félicitations pour avoir gagné la partie et affiche le nombre de tours joués.
     """
-    if(nb_turns > nb_turns_limit):
+    if(nb_turns > NB_TURNS_LIMIT):
         print('\nPartie perdu...')
         print(f'La réponse était {secret_colors}')
     else:
@@ -52,14 +52,14 @@ def print_end_game_infos(nb_turns: int, nb_turns_limit: int, secret_colors: list
         print(f'Nombre de tours : {nb_turns-1}')
         exit()
 
-def get_user_choice(nb_turns: int, colors: list, nb_combinations: int) -> tuple:
+def get_user_choice(nb_turns: int, COLORS: list, NB_COMBINATIONS: int) -> tuple:
     """
     Demande à l'utilisateur de choisir une combinaison de couleurs ou d'activer le solveur.
 
     Args:
     nb_turns (int): Le numéro du tour en cours.
-    colors (list): Liste des couleurs autorisées (par exemple, ['r', 'b', 'v', 'j', 'm', 'o']).
-    nb_combinations (int): Nombre de couleurs par combinaison.
+    COLORS (list): Liste des couleurs autorisées (par exemple, ['r', 'b', 'v', 'j', 'm', 'o']).
+    NB_COMBINATIONS (int): Nombre de couleurs par combinaison.
 
     Returns:
     tuple: Un tuple contenant deux éléments :
@@ -74,12 +74,12 @@ def get_user_choice(nb_turns: int, colors: list, nb_combinations: int) -> tuple:
             return None, True  # Activation du solveur
         else:
             print('L\'activation du solveur n\'est possible que durant le premier tour.')
-    while not check_string_composition(user_choice, colors, nb_combinations):
+    while not check_string_composition(user_choice, COLORS, NB_COMBINATIONS):
         print('Veuillez rentrer une suite de couleurs autorisées (r b v j m o) :')
         user_choice = list(input())
     return user_choice, False
 
-def solver_processing(still_possible_combinations: list, user_choice: list, try_res: tuple, colors: list, nb_combinations: int) -> tuple:
+def solver_processing(still_possible_combinations: list, user_choice: list, try_res: tuple, COLORS: list, NB_COMBINATIONS: int) -> tuple:
     """
     Gère le traitement du solveur pour trouver la prochaine combinaison à essayer.
 
@@ -95,8 +95,8 @@ def solver_processing(still_possible_combinations: list, user_choice: list, try_
     still_possible_combinations (list): Liste des combinaisons possibles restantes.
     user_choice (list): Dernière combinaison de couleurs choisie par l'utilisateur ou par le solveur.
     try_res (tuple): Résultat du dernier essai (nb_bien_place, nb_mal_place) ou None si c'est le premier essai.
-    colors (list): Liste des couleurs autorisées.
-    nb_combinations (int): Nombre de couleurs par combinaison.
+    COLORS (list): Liste des couleurs autorisées.
+    NB_COMBINATIONS (int): Nombre de couleurs par combinaison.
 
     Returns:
     tuple: Un tuple contenant deux éléments :
@@ -104,7 +104,7 @@ def solver_processing(still_possible_combinations: list, user_choice: list, try_
       - user_choice (list): La prochaine combinaison de couleurs que le solveur souhaite essayer.
     """
     if try_res is None:
-        still_possible_combinations = list(itertools.product(colors, repeat=nb_combinations))
+        still_possible_combinations = list(itertools.product(COLORS, repeat=NB_COMBINATIONS))
         user_choice = ['r','r','b','b']
     else:
         still_possible_combinations = remove_impossible_combinations(still_possible_combinations, user_choice, try_res[0], try_res[1])
@@ -190,20 +190,20 @@ def define_next_combination_try(still_possible_combinations: list) -> list:
             
     return best_combination
 
-def check_string_composition(input_string: str, string_list: list, nb_combinations: int) -> bool:
+def check_string_composition(input_string: str, string_list: list, NB_COMBINATIONS: int) -> bool:
     '''
     Vérifie si la chaîne de caractères est composée uniquement de chaînes présentes dans la liste donnée.
 
     Args:
         input_string (str): La chaîne à vérifier.
         string_list (list): Liste de chaînes de caractères à comparer.
-        nb_combinations (int): Nombre de couleurs par combinaisons.
+        NB_COMBINATIONS (int): Nombre de couleurs par combinaisons.
 
     Returns:
         bool: True si la chaîne est composée uniquement de caractères de la liste, False sinon.
     '''
     # On vérifie la bonne taille de input_string et si chaque caractère de input_string est bien dans string_list.
-    return len(input_string) <= nb_combinations and all(char in string_list for char in input_string)
+    return len(input_string) <= NB_COMBINATIONS and all(char in string_list for char in input_string)
 
 
 if __name__ == '__main__':
