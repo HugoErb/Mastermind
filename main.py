@@ -7,7 +7,13 @@ NB_TURNS_LIMIT = 8
 
 def main():
     secret_colors = random.sample(COLORS, NB_COMBINATIONS)
-    print(' '.join(secret_colors))
+    # print(' '.join(secret_colors))
+
+    nb_turns = game(secret_colors)
+
+    print_end_game_infos(nb_turns, NB_TURNS_LIMIT, secret_colors)
+
+def game(secret_colors: list) -> int:
     nb_bien_place = 0
     nb_turns = 1
     solver_activated = False
@@ -28,8 +34,7 @@ def main():
         print(nb_bien_place, ' bien placé(s)')
         print(try_res[1], ' mal placé(s)')
         nb_turns += 1
-
-    print_end_game_infos(nb_turns, NB_TURNS_LIMIT, secret_colors)
+    return nb_turns
         
 def print_end_game_infos(nb_turns: int, NB_TURNS_LIMIT: int, secret_colors: list):
     """
