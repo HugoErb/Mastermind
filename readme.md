@@ -1,8 +1,5 @@
-# Projet Mastermind
-## Introduction
-Mastermind est un jeu de réflexion et de déduction créé par Mordecai Meirowitz dans les années 1970. Le but du jeu est de déterminer une combinaison secrète de couleurs en un minimum de tentatives.
-
-Le jeu se joue généralement avec une combinaison de 4 pions, chacun pouvant être de l'une des 6 couleurs différentes. Le joueur qui tente de deviner la combinaison fait une série de tentatives. Après chaque tentative, il reçoit un feedback sous forme de pions noirs et blancs. Un pion noir signifie qu'un pion de la tentative est de la bonne couleur et est placé à la bonne position. Un pion blanc signifie qu'un pion de la tentative est de la bonne couleur mais n'est pas placé à la bonne position.
+# Mastermind
+Ce projet est un clone du Mastermind, un jeu de réflexion et de déduction où le but est de déterminer une combinaison secrète de couleurs en un minimum de tentatives. Ce projet inclut également un solveur basé sur l'algorithme de Knuth.
 
 ## Algorithme de Knuth
 L'algorithme de Knuth est une méthode pour résoudre le jeu Mastermind en un minimum de tentatives. Il a été développé par Donald Knuth en 1977 et garantit de trouver la combinaison secrète en 5 tentatives ou moins.
@@ -23,4 +20,4 @@ L'algorithme fonctionne comme suit :
 
 1. Clonez ce dépôt GitHub.
 1. Exécutez python main.py dans un terminal.
-1. Suivez les instructions à l'écran pour entrer vos tentatives et recevoir le feedback. Pour activer le solveur, rentrez '*' lors du premier tour.
+1. Suivez les instructions à l'écran pour entrer vos tentatives et recevoir un retour. Pour activer le solveur, rentrez '*' lors du premier tour.
