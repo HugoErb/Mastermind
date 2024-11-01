@@ -20,7 +20,6 @@ L'algorithme fonctionne comme suit :
 1. Répéter : Répéter les étapes 3 et 4 jusqu'à ce que la combinaison correcte soit trouvée.
 
 ## Utilisation
-[Incluez ici les instructions pour utiliser votre code, par exemple :]
 
 1. Clonez ce dépôt GitHub.
 1. Exécutez python main.py dans un terminal.
