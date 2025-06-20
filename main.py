@@ -50,7 +50,7 @@ def print_end_game_infos(nb_turns: int, NB_TURNS_LIMIT: int, secret_colors: list
     Sinon, la fonction affiche un message de félicitations pour avoir gagné la partie et affiche le nombre de tours joués.
     """
     if(nb_turns > NB_TURNS_LIMIT):
-        print('\nPartie perdu...')
+        print('\nPartie perdue...')
         print(f'La réponse était {secret_colors}')
     else:
         print('\nPartie gagnée, bravo !')
