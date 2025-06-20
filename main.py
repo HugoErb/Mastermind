@@ -71,8 +71,7 @@ def get_user_choice(nb_turns: int, COLORS: list, NB_COMBINATIONS: int) -> tuple:
       - user_choice (list): La liste des couleurs choisies par l'utilisateur.
       - bool: True si l'utilisateur a choisi d'activer le solveur, False sinon.
     """
-    print('Quel est votre choix (r b v j m o) :')
-    user_choice = list(input())
+    user_choice = list(input('Quel est votre choix (r b v j m o) :'))
     if user_choice == ['*']:
         if nb_turns == 1:
             print('Activation du solveur')
@@ -80,8 +79,7 @@ def get_user_choice(nb_turns: int, COLORS: list, NB_COMBINATIONS: int) -> tuple:
         else:
             print('L\'activation du solveur n\'est possible que durant le premier tour.')
     while not check_string_composition(user_choice, COLORS, NB_COMBINATIONS):
-        print('Veuillez rentrer une suite de couleurs autorisées (r b v j m o) :')
-        user_choice = list(input())
+        user_choice = list(input('Veuillez rentrer une suite de couleurs autorisées (r b v j m o) :'))
     return user_choice, False
 
 def solver_processing(still_possible_combinations: list, user_choice: list, try_res: tuple, COLORS: list, NB_COMBINATIONS: int) -> tuple:
@@ -150,12 +148,10 @@ def check_colors(user_choice: list, secret_colors: list) -> tuple:
     """
     nb_bien_place = 0
     nb_good_color = 0
-    tmp_list = list(secret_colors)
     for i in range(len(user_choice)):
-        if user_choice[i] == tmp_list[i]:
+        if user_choice[i] == secret_colors[i]:
             nb_bien_place += 1
-            tmp_list[i] = None
-        elif user_choice[i] in tmp_list:
+        elif user_choice[i] in secret_colors:
             nb_good_color += 1
     return nb_bien_place, nb_good_color
 
