@@ -7,7 +7,7 @@ NB_TURNS_LIMIT = 8
 
 def main():
     secret_colors = random.sample(COLORS, NB_COMBINATIONS)
-    # print(' '.join(secret_colors))
+    print(' '.join(secret_colors))
 
     nb_turns = game(secret_colors)
 
@@ -15,12 +15,13 @@ def main():
 
 def game(secret_colors: list) -> int:
     nb_bien_place = 0
-    nb_turns = 1
+    nb_turns = 0
     solver_activated = False
     still_possible_combinations = []
     try_res = None
 
     while nb_bien_place != NB_COMBINATIONS and nb_turns <= NB_TURNS_LIMIT:
+        nb_turns += 1
         print(f'\nTour n° {nb_turns}')
         if not solver_activated:
             user_choice, solver_activated = get_user_choice(nb_turns, COLORS, NB_COMBINATIONS)
@@ -33,7 +34,6 @@ def game(secret_colors: list) -> int:
         nb_bien_place = try_res[0]
         print(nb_bien_place, ' bien placé(s)')
         print(try_res[1], ' mal placé(s)')
-        nb_turns += 1
     return nb_turns
         
 def print_end_game_infos(nb_turns: int, NB_TURNS_LIMIT: int, secret_colors: list):
@@ -54,7 +54,7 @@ def print_end_game_infos(nb_turns: int, NB_TURNS_LIMIT: int, secret_colors: list
         print(f'La réponse était {secret_colors}')
     else:
         print('\nPartie gagnée, bravo !')
-        print(f'Nombre de tours : {nb_turns-1}')
+        print(f'Nombre de tours : {nb_turns}')
         exit()
 
 def get_user_choice(nb_turns: int, COLORS: list, NB_COMBINATIONS: int) -> tuple:
@@ -79,7 +79,7 @@ def get_user_choice(nb_turns: int, COLORS: list, NB_COMBINATIONS: int) -> tuple:
         else:
             print('L\'activation du solveur n\'est possible que durant le premier tour.')
     while not check_string_composition(user_choice, COLORS, NB_COMBINATIONS):
-        user_choice = list(input('Veuillez rentrer une suite de couleurs autorisées (r b v j m o) :'))
+        user_choice = list(input(f'Veuillez rentrer une suite de {NB_COMBINATIONS} couleurs autorisées (r b v j m o) :'))
     return user_choice, False
 
 def solver_processing(still_possible_combinations: list, user_choice: list, try_res: tuple, COLORS: list, NB_COMBINATIONS: int) -> tuple:
@@ -193,7 +193,7 @@ def define_next_combination_try(still_possible_combinations: list) -> list:
 
 def check_string_composition(input_string: str, string_list: list, NB_COMBINATIONS: int) -> bool:
     '''
-    Vérifie si la chaîne de caractères est composée uniquement de chaînes présentes dans la liste donnée.
+    Vérifie si la chaîne de caractères est composée uniquement de n caractères présents dans la liste donnée.
 
     Args:
         input_string (str): La chaîne à vérifier.
