@@ -108,11 +108,11 @@ def solver_processing(still_possible_combinations: list, user_choice: list, try_
       - user_choice (list): La prochaine combinaison de couleurs que le solveur souhaite essayer.
     """
     if try_res is None:
-        still_possible_combinations = list(itertools.product(COLORS, repeat=NB_COMBINATIONS))
-        user_choice = ['r','r','b','b']
+        still_possible_combinations = list(itertools.permutations(COLORS, NB_COMBINATIONS))
+        user_choice = ['r', 'b', 'v', 'j']
     else:
         still_possible_combinations = remove_impossible_combinations(still_possible_combinations, user_choice, try_res[0], try_res[1])
-        user_choice = define_next_combination_try(still_possible_combinations)
+        user_choice = define_next_combination_try(still_possible_combinations, COLORS, NB_COMBINATIONS)
     print(f'Le solveur a choisi {user_choice}')
     return still_possible_combinations, user_choice
 
@@ -152,41 +152,43 @@ def check_colors(user_choice: list, secret_colors: list) -> tuple:
     nb_good_color = common - nb_bien_place
     return nb_bien_place, nb_good_color
 
-def define_next_combination_try(still_possible_combinations: list) -> list:
+def define_next_combination_try(still_possible_combinations: list, colors: list, nb_combinations: int) -> list:
     """
     Détermine la meilleure combinaison à essayer ensuite en minimisant le pire des cas du nombre de combinaisons restantes possibles.
+    Recherche parmi toutes les combinaisons possibles (pas seulement celles encore candidates) conformément à l'algorithme de Knuth.
+    En cas d'égalité, préfère une combinaison encore dans l'ensemble des possibles.
 
     Args:
     still_possible_combinations (list): Liste des combinaisons possibles restantes.
+    colors (list): Liste des couleurs autorisées.
+    nb_combinations (int): Nombre de couleurs par combinaison.
 
     Returns:
     list: La meilleure combinaison à essayer ensuite.
     """
+    all_combinations = list(itertools.permutations(colors, nb_combinations))
     score_min = float('inf')
     best_combination = None
-    
-    # On créé un dictionnaire pour stocker le nombre de combinaisons qui donneraient chaque réponse possible
-    possible_responses = {response: 0 for response in itertools.product(range(5), repeat=2)}
-    possible_responses_tmp = possible_responses.copy()
-    
-    # Pour chaque combinaison possible, on calcule le nombre de combinaisons qui donneraient chaque réponse possible
-    for combination in still_possible_combinations:
+    possible_responses = dict.fromkeys(itertools.product(range(nb_combinations + 1), repeat=2), 0)
+
+    for combination in all_combinations:
+        possible_responses_tmp = possible_responses.copy()
         for combination2 in still_possible_combinations:
             response = check_colors(combination, combination2)
             possible_responses_tmp[response] += 1
-    
-        # Trouver le maximum des combinaisons restantes pour chaque réponse possible
+
         max_restantes = max(possible_responses_tmp.values())
 
-        # Si cette combinaison minimise le nombre maximum de combinaisons restantes, alors on considère que c'est pour l'instant la meilleure combinaison à tester
-        if max_restantes < score_min:
+        # En cas d'égalité, préférer une combinaison encore possible (tiebreaking Knuth)
+        if max_restantes < score_min or (
+            max_restantes == score_min
+            and combination in still_possible_combinations
+            and best_combination not in still_possible_combinations
+        ):
             best_combination = combination
             score_min = max_restantes
-        
-        # Réinitialisation des réponses pour la prochaine itération
-        possible_responses_tmp = possible_responses.copy()
-            
-    return best_combination
+
+    return list(best_combination)
 
 def check_string_composition(input_string: str, string_list: list, NB_COMBINATIONS: int) -> bool:
     '''
