@@ -1,5 +1,7 @@
 import random
 import itertools
+import sys
+from collections import Counter
 
 COLORS = ['r', 'b', 'v', 'j', 'm', 'o']
 NB_COMBINATIONS = 4
@@ -7,20 +9,19 @@ NB_TURNS_LIMIT = 8
 
 def main():
     secret_colors = random.sample(COLORS, NB_COMBINATIONS)
-    print(' '.join(secret_colors))
 
-    nb_turns = game(secret_colors)
+    nb_turns, won = game(secret_colors)
 
-    print_end_game_infos(nb_turns, NB_TURNS_LIMIT, secret_colors)
+    print_end_game_infos(nb_turns, won, secret_colors)
 
-def game(secret_colors: list) -> int:
+def game(secret_colors: list) -> tuple[int, bool]:
     nb_bien_place = 0
     nb_turns = 0
     solver_activated = False
     still_possible_combinations = []
     try_res = None
 
-    while nb_bien_place != NB_COMBINATIONS and nb_turns <= NB_TURNS_LIMIT:
+    while nb_bien_place != NB_COMBINATIONS and nb_turns < NB_TURNS_LIMIT:
         nb_turns += 1
         print(f'\nTour n° {nb_turns}')
         if not solver_activated:
@@ -34,28 +35,28 @@ def game(secret_colors: list) -> int:
         nb_bien_place = try_res[0]
         print(nb_bien_place, ' bien placé(s)')
         print(try_res[1], ' mal placé(s)')
-    return nb_turns
+    return nb_turns, nb_bien_place == NB_COMBINATIONS
         
-def print_end_game_infos(nb_turns: int, NB_TURNS_LIMIT: int, secret_colors: list):
+def print_end_game_infos(nb_turns: int, won: bool, secret_colors: list):
     """
     Affiche les informations de fin de partie, indiquant si l'utilisateur a gagné ou perdu, et, le cas échéant, affiche les couleurs secrètes.
 
     Args:
     nb_turns (int): Le nombre de tours joués.
-    NB_TURNS_LIMIT (int): Le nombre maximum de tours autorisés.
+    won (bool): True si l'utilisateur a trouvé la combinaison, False sinon.
     secret_colors (list): Liste des couleurs secrètes.
 
     Notes:
-    Si le nombre de tours joués est supérieur à la limite de tours, affiche un message indiquant que la partie est perdue et affiche les couleurs recherchées.
+    Si le joueur n'a pas gagné, affiche un message indiquant que la partie est perdue et affiche les couleurs recherchées.
     Sinon, la fonction affiche un message de félicitations pour avoir gagné la partie et affiche le nombre de tours joués.
     """
-    if(nb_turns > NB_TURNS_LIMIT):
+    if not won:
         print('\nPartie perdue...')
         print(f'La réponse était {secret_colors}')
     else:
         print('\nPartie gagnée, bravo !')
         print(f'Nombre de tours : {nb_turns}')
-        exit()
+        sys.exit()
 
 def get_user_choice(nb_turns: int, COLORS: list, NB_COMBINATIONS: int) -> tuple:
     """
@@ -112,7 +113,7 @@ def solver_processing(still_possible_combinations: list, user_choice: list, try_
     else:
         still_possible_combinations = remove_impossible_combinations(still_possible_combinations, user_choice, try_res[0], try_res[1])
         user_choice = define_next_combination_try(still_possible_combinations)
-    print(f'Le solveur à choisi {user_choice}')
+    print(f'Le solveur a choisi {user_choice}')
     return still_possible_combinations, user_choice
 
 def remove_impossible_combinations(still_possible_combinations: list, user_choice:list, nb_bien_places:int, nb_good_colors:int) -> list:
@@ -146,13 +147,9 @@ def check_colors(user_choice: list, secret_colors: list) -> tuple:
       - nb_bien_place (int): Le nombre de couleurs de la sélection de l'utilisateur qui sont identiques et à la même position que dans les couleurs secrètes.
       - nb_good_color (int): Le nombre de couleurs de la sélection de l'utilisateur qui sont présentes dans les couleurs secrètes mais qui ne sont pas à la bonne position.
     """
-    nb_bien_place = 0
-    nb_good_color = 0
-    for i in range(len(user_choice)):
-        if user_choice[i] == secret_colors[i]:
-            nb_bien_place += 1
-        elif user_choice[i] in secret_colors:
-            nb_good_color += 1
+    nb_bien_place = sum(u == s for u, s in zip(user_choice, secret_colors))
+    common = sum((Counter(user_choice) & Counter(secret_colors)).values())
+    nb_good_color = common - nb_bien_place
     return nb_bien_place, nb_good_color
 
 def define_next_combination_try(still_possible_combinations: list) -> list:
@@ -204,7 +201,7 @@ def check_string_composition(input_string: str, string_list: list, NB_COMBINATIO
         bool: True si la chaîne est composée uniquement de caractères de la liste, False sinon.
     '''
     # On vérifie la bonne taille de input_string et si chaque caractère de input_string est bien dans string_list.
-    return len(input_string) <= NB_COMBINATIONS and all(char in string_list for char in input_string)
+    return len(input_string) == NB_COMBINATIONS and all(char in string_list for char in input_string)
 
 
 if __name__ == '__main__':
