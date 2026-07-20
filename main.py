@@ -1,6 +1,5 @@
 import random
 import itertools
-import sys
 from collections import Counter
 
 COLORS = ['r', 'b', 'v', 'j', 'm', 'o']
@@ -8,11 +7,15 @@ NB_COMBINATIONS = 4
 NB_TURNS_LIMIT = 8
 
 def main():
-    secret_colors = random.sample(COLORS, NB_COMBINATIONS)
+    relancer = True
 
-    nb_turns, won = game(secret_colors)
+    while relancer:
+        secret_colors = random.sample(COLORS, NB_COMBINATIONS)
 
-    print_end_game_infos(nb_turns, won, secret_colors)
+        nb_turns, won = game(secret_colors)
+
+        print_end_game_infos(nb_turns, won, secret_colors)
+        relancer = ask_replay()
 
 def game(secret_colors: list) -> tuple[int, bool]:
     nb_bien_place = 0
@@ -56,7 +59,15 @@ def print_end_game_infos(nb_turns: int, won: bool, secret_colors: list):
     else:
         print('\nPartie gagnée, bravo !')
         print(f'Nombre de tours : {nb_turns}')
-        sys.exit()
+
+def ask_replay() -> bool:
+    while True:
+        choice = input('\nTapez r pour relancer ou f pour fermer : ').strip().lower()
+        if choice == 'r':
+            return True
+        if choice == 'f':
+            return False
+        print('Choix invalide.')
 
 def get_user_choice(nb_turns: int, COLORS: list, NB_COMBINATIONS: int) -> tuple:
     """
